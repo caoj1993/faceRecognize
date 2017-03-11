@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>faceDetect</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <script src="js/jquery.min.js"></script>
+    <script src="js/jquery.form.js"></script>
+    <script src="js/jquery.danmu.min.js"></script>
+    <link rel="stylesheet" href="//at.alicdn.com/t/font_1477048718_6274116.css"/>
+    <style>
+        audio,body,dl,dd,h1,h2,h3,h4,h5,h6,p,span,b,img,ul,li,strong,button{margin:0;padding:0;}
+        body{font-family:"PingFang SC","Helvetica Neue", Helvetica, STHeiTi, "Microsoft YaHei", Arial, sans-serif; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; height: 100%;}
+        html{ font-size: 20px; line-height: 1.5;min-height: 100%;}
+        h1,h2,h3,h4,h5,h6,b,strong{font-weight:normal;}
+        ul,li{list-style: none}
+        input{outline: 0;border: 0;background: none;-webkit-tap-highlight-color:rgba(255,255,255,0);}
+        body{
+            width: 100%;
+            background: url("images/bg5.jpg") no-repeat top center #223249;
+            background-size: 100%;
+            min-height: 100%;
+        }
+        audio{
+            position: fixed;
+        }
+        .iconfont{
+            font-family:"iconfont";
+            font-size:16px;
+            font-style:normal;
+            -webkit-font-smoothing: antialiased;
+            -webkit-text-stroke-width: 0.2px;
+            display: block;
+        }
+        @font-face {
+            font-family: 'iconfont';
+            src: url('//at.alicdn.com/t/font_1477048718_3112886.eot'); /* IE9*/
+            src: url('//at.alicdn.com/t/font_1477048718_3112886.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+            url('//at.alicdn.com/t/font_1477048718_3112886.woff') format('woff'), /* chrome、firefox */
+            url('//at.alicdn.com/t/font_1477048718_3112886.ttf') format('truetype'), /* chrome、firefox、opera、Safari, Android, iOS 4.2+*/
+            url('//at.alicdn.com/t/font_1477048718_3112886.svg#iconfont') format('svg'); /* iOS 4.1- */
+        }
+        .wrap{
+            max-width:620px;
+            margin: 0 auto;
+            text-align: center;
+            font-size: 0;
+            padding-top: 20px;
+        }
+
+        #form{
+            font-size: 0;
+            width: 340px;
+            height: 40px;
+            position: relative;
+            margin: 0 auto;
+        }
+        #form .selectBtn{
+            width: 160px;
+            height: 40px;
+            position: absolute;
+            left: 0;
+            top: 0;
+            z-index: 11;
+            opacity: 0;
+
+        }
+        #form .preBtn{
+            width: 160px;
+            height: 40px;
+            position: absolute;
+            right: 0;
+            top: 0;
+            z-index: 11;
+            opacity: 0;
+
+        }
+        #form .selectCover{
+            width: 160px;
+            height: 40px;
+            background:#e2e2e2;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 10;
+            border-radius: 10px;
+
+
+        }
+        #form .iconfont{
+            font-size: 24px;
+            color: #0d0e1d;
+            position: absolute;
+            left: 18px;
+            top: 1px;
+        }
+        #form .text{
+            font-size: 16px;
+            line-height: 40px;
+            position: absolute;
+            width: 90px;
+            text-align: center;
+            height: 40px;
+            top: 1px;
+            right: 22px;
+
+
+        }
+        #form .preCover{
+            width: 160px;
+            height: 40px;
+            background:#e2e2e2;
+            position: absolute;
+            top: 0;
+            right: 0;
+            z-index: 10;
+            border-radius: 10px;
+        }
+        .imgWrap span {
+            position: absolute;
+            background: url("images/facemark.png") no-repeat center;
+            background-size: 100% 100%;
+        }
+        .text-cont{
+            font-size: 16px;
+            height: 28px;
+            line-height: 28px;
+            text-align: center;
+            color: #ffffff;
+        }
+        .imgWrap{
+            display: inline-block;
+            position: relative;
+            width: 340px;
+            margin: 0 auto;
+            overflow: hidden;
+        }
+        .imgWrap .scan{
+            position: absolute;
+            width: 340px;
+            height: 100%;
+            left: 0;
+            top: 0;
+            background: url("images/scan.png") repeat-y top center;
+        }
+        .imgWrap .scan-line{
+            background: url("images/scan-line.png") no-repeat center;
+            background-size: 100%;
+            width: 340px;
+            height: 31px;
+            position: absolute;
+            left: 0;
+            top: 0;
+            z-index: 100;
+        }
+        .scan-line .light{
+            width: 155px;
+            height: 24px;
+            background: url("images/light.png") no-repeat;
+            background-size:100% 100%;
+            position: absolute;
+            top: 3.5px;
+            left: -10px;
+            animation: move 1s ease-in-out infinite alternate;
+        }
+        @keyframes move {
+            0%{transform: translateX(0)}
+            100%{transform: translateX(192px)}
+        }
+        .scanWrap{
+            opacity: 0;
+            transition: all 0.3s ease-in;
+            -webkit-transition: all 0.3s ease-in;
+            display: none;
+        }
+        #danmu{
+            height: 100%;
+        }
+        .list{
+            color: #ffffff;
+            font-size:0;
+            text-align: center;
+        }
+        .list .item{
+            padding-top:10px;
+            width: 120px;
+            display: inline-block;
+            font-size: 14px;
+            line-height:18px;
+        }
+        .list .mark span{
+            color:#C0504D;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="danmu"></div>
+    <audio src="media/music.mp3" id="music" loop="loop"></audio>
+    <div class="wrap">
+        <p class="shot"></p>
+        <div class="imgWrap">
+            <img id="img" src="images/mys2.png" width="100%" />
+            <div class="scanWrap">
+                <div class="scan"></div>
+                <div class="scan-line">
+                    <em class="light"></em>
+                </div>
+            </div>
+
+        </div>
+        <p class="text-cont"></p>
+        <form id="form" enctype="multipart/form-data" method="post" action="http://up.imgapi.com/">
+            <input name="Token"  value="e65e7d3049173035104d0cc3754e9f0444ca4704:vXeVBEbHOpIm6OrKoOXj06IUF-Y=:eyJkZWFkbGluZSI6MTQ3NDk3MTM4NCwiYWN0aW9uIjoiZ2V0IiwidWlkIjoiNTc1MjU1IiwiYWlkIjoiMTI0ODUwOSIsImZyb20iOiJmaWxlIn0=" type="hidden">
+            <input type="file" name="file" id="file" accept="image/*"  class="selectBtn">
+            <input type="hidden" name="from" value="file">
+            <input type="hidden" name="httptype" value="1">
+            <input type="hidden" name="aid" value="1248509"/>
+            <input type="submit" id='btn' value="" class="preBtn">
+            <div  class="selectCover">
+                <span class="iconfont icon-xiangji"></span>
+                <span class="text">选择图片</span>
+            </div>
+            <div class="preCover">
+                <span class="iconfont icon-tmdog"></span>
+                <span class="text">Run</span>
+            </div>
+        </form>
+        <div class="list">
+
+
+        </div>
+
+    </div>
+
+
+</body>
+
+<script src="js/facepp-sdk.min.js"></script>
+<script>
+    $('#file').change(function(){
+        $('.sex,.age,.text-cont').html('');
+        $('.list .item').remove();
+        $('.imgWrap span').remove();
+        $('.scanWrap').hide();
+        $('.scanWrap').css({opacity:'0'});
+        var oFReader = new FileReader();
+        oFReader.readAsDataURL(this.files[0]);
+
+        oFReader.onload = function (oFREvent) {
+            $('#img').attr('src',oFREvent.target.result);
+        };
+    });
+
+    var api = new FacePP('6cf6102ed90229ea906cf74cd8b54e98', 'PelnXUI4amIDR0i0NwTNfuzUCHa6ZbYg');
+    $(document).ready(function(){
+        var face={
+            init:function(){
+                var self=this;
+                self.bindEvt();
+            },
+            bindEvt:function(){
+                var self=this;
+                $('#btn').on('click',function(){
+                    if($('#img').attr('src')=='images/mys2.png'){
+                        alert('还没选择图片呐0.0');
+                        return;
+                    }else{
+                        self.animLine(true);
+                        $('.text-cont').html('识别中······');
+                        self.uploadPic();
+                    }
+                })
+            },
+//            上传图片
+            uploadPic:function(){
+                var self=this;
+                //判断上传文件的类型
+                filepath=$("#file").val();
+                var extStart=filepath.lastIndexOf(".");
+                var ext=filepath.substring(extStart,filepath.length).toUpperCase();
+                if(ext!=".BMP"&&ext!=".PNG"&&ext!=".GIF"&&ext!=".JPG"&&ext!=".JPEG"){
+                    alert("图片限于png,gif,jpeg,jpg格式");
+                    return false;
+                }
+                $("#form").ajaxForm(function(data,status){
+                    var imginfo = data;
+                    //获取图片宽度
+                    var img_width = imginfo.width;
+                    //获取图片高度
+                    var img_height = imginfo.height;
+
+                    //如果图片像素大于350px，则等比例缩放
+                    if(img_width >= 350){
+                        var b = img_width / 340;
+                        img_width = img_width / b;
+                        img_height = img_height / b;
+                    }
+                    if(status == "success") {
+                        var _url=imginfo.linkurl;
+                        self.faceDet(_url);
+                    }
+                    else{
+                        alert('上传错误！请重新上传图片。');
+                    }
+                });
+            },
+
+            faceDet:function(url){
+                var self=this;
+                api.request('detection/detect',
+                        {
+                            url: url,
+                            attribute:"gender,age,race,smiling,pose"
+                        },
+                        function(err, res) {
+                            if (err) {
+                                return;
+                            }else if(res.face.length == 0){
+                                setTimeout(function(){
+                                    self.animLine(false);
+                                    $('.text-cont').html('不明物体。。。');
+                                },1000)
+                            }else{
+//                                console.log(res);
+                                var pw=340,ph=res.img_height*340/res.img_width;
+                                var N=res.face.length;
+                                var html='';
+                                for(var i= 0;i<N;i++){
+                                    var facePos=res.face[i].position;
+                                    var _W=facePos.width*340/100;
+                                    var _H=facePos.height*ph/100;
+                                    var posX=facePos.center.x*340/100-_W/2;
+                                    var posY=facePos.center.y*ph/100-_H/2;
+                                    var angle=res.face[i].attribute.pose.roll_angle.value;
+                                    var _faceId=res.face[i].face_id;
+                                    var _sex;
+                                    var _age=res.face[i].attribute.age.value;
+
+                                    if(res.face[i].attribute.gender.value == 'Male'){
+                                        _sex='男'
+                                    }else if(res.face[i].attribute.gender.value == 'Female'){
+                                        _sex='女'
+                                    }
+//                                    self.addface(_faceId);
+                                    self.compareFace(_faceId,i,_age,_sex,_W,_H,posX,posY,angle);
+                                }
+                            }
+
+                        }
+                );
+            },
+            addface:function (faceId) {
+                api.request( '/person/add_face',
+                        {
+                            face_id:faceId,
+                            person_id:'55277486eb003ec4cff0ecc6a09f06c2'
+                        },function (err,res) {
+                            if(err){
+                                return
+                            }
+                            console.log(res)
+                        })
+            },
+            compareFace:function (faceId,i,age,sex,_W,_H,posX,posY,angle) {
+                var self=this;
+                api.request( 'recognition/verify',
+                        {
+                            face_id:faceId,
+                            person_id:'55277486eb003ec4cff0ecc6a09f06c2'
+                        },
+                        function (err,res) {
+                            if(err){
+                                return
+                            }
+//                            console.log(res);
+                            if(res.is_same_person && res.confidence>=90){
+                                $('.list').append(
+                                        '<div class="item">'
+                                        +'<p class="sex">性别：仙女</p>'
+                                        +'<p class="age">年龄：永远18岁</p>'
+                                        +'<p class="mark">颜值：<span>爆表</span></p>'
+                                        +'</div>'
+                                );
+                                self.animLine(false);
+                                $('.imgWrap').append(
+                                        "<span class=face_"+i+"></span>"
+                                );
+                                $('.face_'+i).css({
+                                    'width':_W+'px',
+                                    'height':_H+'px',
+                                    'left':posX,
+                                    'top':posY,
+                                    'transform':'rotateZ('+angle+'deg)'
+                                });
+                                $('.text-cont').html('终于等到你xxx');
+                                $('#music')[0].play();
+                                self.danmu();
+                            }else{
+                                self.animLine(false);
+                                $('.imgWrap').append(
+                                        "<span class=face_"+i+"></span>"
+                                );
+                                $('.face_'+i).css({
+                                    'width':_W+'px',
+                                    'height':_H+'px',
+                                    'left':posX,
+                                    'top':posY,
+                                    'transform':'rotateZ('+angle+'deg)'
+                                });
+                                self.faceLandmark(faceId,sex,age);
+
+                            }
+                        }
+                )
+            },
+            faceLandmark:function(faceId,sex,age){
+                function distance(x1,y1,x2,y2){
+                    return Math.sqrt(Math.pow(x2 - x1,2) + Math.pow(y2 - y1,2));
+                }
+                api.request('detection/landmark',
+                        {
+                            face_id: faceId
+                        },
+                        function(err, res) {
+                            if (err) {
+                                return;
+                            }
+                            var _data=res.result[0].landmark;
+                            //脸的宽度
+                            var L=distance(_data.contour_left1.x,_data.contour_left1.y,_data.contour_right1.x,_data.contour_right1.y);
+                            //眼角的宽度
+                            var L1=distance(_data.left_eye_right_corner.x,_data.left_eye_right_corner.y ,_data.right_eye_left_corner.x,_data.right_eye_left_corner.y);
+                            //眼睛的宽度，取两眼宽度平均值
+                            var L2=(distance(_data.left_eye_left_corner.x,_data.left_eye_left_corner.y,_data.left_eye_right_corner.x,_data.left_eye_right_corner.y)+distance(_data.right_eye_left_corner.x,_data.right_eye_left_corner.y,_data.right_eye_right_corner.x,_data.right_eye_right_corner.y))/2;
+                            //鼻子的宽度
+                            var L3=distance(_data.nose_left.x,_data.nose_left.y,_data.nose_right.x,_data.nose_right.y);
+                            //嘴巴宽度
+                            var L4=distance(_data.mouth_left_corner.x,_data.mouth_left_corner.y,_data.mouth_right_corner.x,_data.mouth_right_corner.y);
+                            //嘴巴处脸的宽度
+                            var L5=distance(_data.contour_left6.x,_data.contour_left6.y,_data.contour_right6.x,_data.contour_right6.y);
+                            //下巴到鼻子的高度
+                            var L6=distance(_data.contour_chin.x,_data.contour_chin.y,_data.nose_contour_lower_middle.x,_data.nose_contour_lower_middle.y);
+                            //眉心到鼻子的高度
+                            var mx=(_data.right_eyebrow_left_corner.x + _data.left_eyebrow_right_corner.x )/2;//眉心x坐标
+                            var my=(_data.right_eyebrow_left_corner.y + _data.left_eyebrow_right_corner.y)/2;//眉心y坐标
+                            var L7=distance(_data.nose_contour_lower_middle.x,_data.nose_contour_lower_middle.y,mx,my);
+                            //计算分数
+                            var mark1=(Math.abs(L1/L-0.2))/0.2;
+                            var mark2=(Math.abs(L2/L-0.2))/0.2;
+                            var mark3=(Math.abs(L3/L-0.2))/0.2;
+                            var mark4=(Math.abs(L4/L5-0.5))/0.5;
+                            var mark5=(1-Math.min(L6,L7)/Math.max(L6,L7));
+//                            console.log(mark1,mark2,mark3,mark4,mark5);
+                            var mark = 100-20*(mark1+mark2+mark3+mark4+mark5);
+                            $('.list').append(
+                                    '<div class="item">'
+                                    +'<p class="sex">性别：'+sex+'</p>'
+                                    +'<p class="age">年龄：'+age+'岁左右</p>'
+                                    +'<p class="mark">颜值：'+parseInt(mark)+'分</p>'
+                                    +'</div>'
+                            );
+                            $('.text-cont').html('识别成功');
+                        }
+                );
+            },
+//            弹幕
+            danmu:function(){
+                $("#danmu").danmu({
+                    left: 0,    //区域的起始位置x坐标
+                    top: 0 ,  //区域的起始位置y坐标
+                    height: '100%', //区域的高度
+                    width: '100%', //区域的宽度
+                    zindex :100, //div的css样式zindex
+                    speed:30000, //弹幕速度，飞过区域的毫秒数
+                    sumtime:600 , //弹幕运行总时间
+                    danmuss:{}, //danmuss对象，运行时的弹幕内容
+                    default_font_color:"#FFFFFF", //弹幕默认字体颜色
+                    font_size_small:16, //小号弹幕的字体大小,注意此属性值只能是整数
+                    font_size_big:40, //大号弹幕的字体大小
+                    opacity:"1", //弹幕默认透明度
+                    top_botton_danmu_time:6000 //顶端底端弹幕持续时间
+                });
+                var i;
+                var text=[
+                    '做我女朋友吧',
+                    '做我女朋友吧',
+                    '做我女朋友吧~做我女朋友吧~',
+                    '想和你一起去很多地方，拍很多照片，所以做我女朋友吧',
+                    '如果你看到了，下班后直接来情人坡',
+                    '如果你看到了，下班后直接来情人坡',
+                    '如果你看到了，下班后直接来情人坡',
+                    '想和你一起去很多地方，拍很多照片，所以做我女朋友吧',
+                    '做我女朋友吧~做我女朋友吧~',
+                    '做我女朋友吧~做我女朋友吧~',
+                    '如果你看到了，下班后直接来情人坡',
+                    '做我女朋友吧~做我女朋友吧~',
+                    '想和你一起去很多地方，拍很多照片，所以做我女朋友吧',
+                    '做我女朋友吧~做我女朋友吧~',
+                    '做我女朋友吧~做我女朋友吧~',
+                    '想和你一起去很多地方，拍很多照片，所以做我女朋友吧'
+
+                ];
+                var fontSize=[0,1];
+                //随机获取颜色值
+                function getReandomColor() {
+                    return '#' + (function (h) {
+                                return new Array(7 - h.length).join("0") + h
+                            })((Math.random() * 0x1000000 << 0).toString(16))
+                }
+
+                for(i=0;i<=80;i++){
+                    var a_danmu='{"text":"'+text[parseInt(Math.random()*text.length)]+'","color":"'+getReandomColor()+'" ,"size":"'+fontSize[parseInt(Math.random()*fontSize.length)]+'","position":"0","time":'+parseInt(Math.random()*300)+'}';
+                    var new_obj=eval('('+a_danmu+')');
+                    $('#danmu').danmu("add_danmu",new_obj);
+                }
+                function danmuStart(){
+                    $('#danmu').danmu('danmu_start');
+                }
+                danmuStart();
+            },
+            animLine:function(b){
+                if(b){
+                    var anim_T=$('.imgWrap').height()-30;
+                    $('.scanWrap').show();
+                    $('.scanWrap').css({opacity:'1'});
+                    var css={top:anim_T+'px'};
+                    $('.scan-line').animate(css,3000,rowBack);
+                    function rowBack() {
+                        if(css.top==0){
+                            css.top=anim_T+'px';
+                        }else if(css.top==anim_T+'px'){
+                            css.top=0;
+                        }
+                        $('.scan-line').animate(css,3000,rowBack);
+                    }
+                }else{
+                    $('.scanWrap').css({opacity:'0'});
+                    setTimeout(function(){$('.scanWrap').hide()},300)
+                }
+
+            }
+        };
+        face.init();
+    });
+</script>
+</html>
