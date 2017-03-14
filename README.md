@@ -7,5 +7,7 @@
   * 功能3：可以把自己的小demo发到朋友圈，自己心仪的女生人脸照片通过api可以像系统添加一个人脸，
   * 然后之后上传的人脸都与这个人脸进行对比识别出是否为同一个人，如果是同一个人的可以进行弹幕表白啊什么的
   * 在线地址演示：[http://caoj.me/static/facereg/index.html](http://caoj.me/static/facereg/index.html)
+  
+ ![](http://cdn-qiniu.qiniudn.com/86b5d519.png)
 
-
+ 手机扫描此二维码
